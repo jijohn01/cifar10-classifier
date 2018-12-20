@@ -4,7 +4,7 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 
-from tensorflow.python.keras.datasets.cifar10 import load_data
+from tensorflow.python.keras.datasets.cifar100 import load_data
 import functions
 
 
@@ -57,12 +57,12 @@ def cnn_classifier(x):
 func = functions.function
 #func.test()
 x = tf.placeholder(tf.float32, shape=[None, 32, 32, 3])
-y = tf.placeholder(tf.float32, shape=[None, 10])
+y = tf.placeholder(tf.float32, shape=[None, 100])
 
 # Load CIFAR-10 dataset 50000장
 (x_train,y_train),(x_test,y_test) = load_data()
-y_train = tf.squeeze(tf.one_hot(y_train,10),axis=1)
-y_test = tf.squeeze(tf.one_hot(y_test,10),axis=1)
+y_train = tf.squeeze(tf.one_hot(y_train,100),axis=1)
+y_test = tf.squeeze(tf.one_hot(y_test,100),axis=1)
 print(np.shape(y_train))
 prediction, logit = func.cnn_classifier(x)
 #imgplot = plt.imshow(x_train[1])
@@ -76,22 +76,28 @@ accuracy = tf.reduce_mean(tf.cast(correct,tf.float32))
 
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
+    loss_list=[]
 
     for i in range(10000):
         #batch size 128
-        batch = next_batch(120,x_train,y_train.eval())
+        batch = next_batch(128,x_train,y_train.eval())
 
         if i%100 ==0:
             loss_print = loss.eval(feed_dict={x: batch[0], y: batch[1]})
-            #valid_batch = next_batch(100,x_test,y_test.eval())
-            #acc = accuracy.eval(feed_dict={x: valid_batch[0], y: valid_batch[1]})
+            valid_batch = next_batch(100,x_test,y_test.eval())
+            acc_val = accuracy.eval(feed_dict={x: valid_batch[0], y: valid_batch[1]})
             acc = accuracy.eval(feed_dict={x: batch[0], y: batch[1]})
+            if i > 2:
+                loss_list.append(loss_print)
            # print(acc)
             print("스텝수 : %d , loss : %f, 정확도(퍼센트) : %f "%(i, loss_print,acc))
+            print("오버피팅 확인용 정확도 : %f"%acc_val)
 
         sess.run(train_step,feed_dict={x: batch[0],y:batch[1]})
 
     print("Learning finished!")
+    plt.plot(loss_list)
+    plt.show()
     test_accuracy = 0.0
     for i in range(10):
         test_batch = next_batch(1000, x_test, y_test.eval())
