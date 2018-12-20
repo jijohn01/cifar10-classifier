@@ -78,7 +78,7 @@ with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
     loss_list=[]
 
-    for i in range(10000):
+    for i in range(20000):
         #batch size 128
         batch = next_batch(128,x_train,y_train.eval())
 
