@@ -9,6 +9,18 @@ class function:
     def test(self):
         print("class test!!!!!!!!")
 
+    def next_batch(self, num, data, labels):
+        '''
+        `num` 개수 만큼의 랜덤한 샘플들과 레이블들을 리턴합니다.
+        '''
+        idx = np.arange(0, len(data))
+        np.random.shuffle(idx)
+        idx = idx[:num]
+        data_shuffle = [data[i] for i in idx]
+        labels_shuffle = [labels[i] for i in idx]
+
+        return np.asarray(data_shuffle), np.asarray(labels_shuffle)
+
     def cnn_classifier(self,x,keep_prop):
         print("NO SKIP CONNECTION")
         # first_layer 32x32x3
@@ -103,11 +115,11 @@ class function:
         #6th layer 8x8x256
         W6 = tf.Variable(tf.truncated_normal(shape=[3, 3, 256, 128], stddev=5e-2))
         L6 = tf.nn.conv2d(L5, W6, strides=[1, 1, 1, 1], padding='SAME')
-        L6 = tf.nn.relu(L6+L3)
+        L6 = tf.nn.relu(L6+L3)# 스킵 커넥션
 
         W7 = tf.Variable(tf.truncated_normal(shape=[3, 3, 128, 128], stddev=5e-2))
         L7 = tf.nn.conv2d(L6, W7, strides=[1, 1, 1, 1], padding='SAME')
-        L7 = tf.nn.relu(L7+L3)
+        L7 = tf.nn.relu(L7+L3)# 스킵 커넥션
 
 
         #fully connected 8x8x128
