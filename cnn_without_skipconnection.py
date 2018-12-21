@@ -76,3 +76,4 @@ with tf.Session() as sess:
         test_accuracy = test_accuracy + accuracy.eval(feed_dict={x: test_batch[0], y: test_batch[1]})
     test_accuracy = test_accuracy / 10;
     print("테스트 데이터 정확도: %f" % test_accuracy)
+    img = test_batch[0][1]
