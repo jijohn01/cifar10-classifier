@@ -9,7 +9,7 @@ class function:
     def test(self):
         print("class test!!!!!!!!")
 
-    def cnn_classifier(x):
+    def cnn_classifier(self,x,keep_prop):
         print("NO SKIP CONNECTION")
         # first_layer 32x32x3
         W1 = tf.Variable(tf.truncated_normal(shape=[3, 3, 3, 64], stddev=5e-2))
@@ -24,6 +24,8 @@ class function:
         L2 = tf.nn.conv2d(L1, W2, strides=[1, 1, 1, 1], padding='SAME')
         L2 = tf.nn.relu(L2)
         L2 = tf.nn.max_pool(L2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding="SAME")
+        L2 = tf.nn.dropout(L2,keep_prop)
+
 
         # third layer 8x8x64
         W3 = tf.Variable(tf.truncated_normal(shape=[3, 3, 64, 128], stddev=5e-2))
@@ -41,6 +43,7 @@ class function:
         L5 = tf.nn.conv2d(L4, W5, strides=[1, 1, 1, 1], padding='SAME')
         L5 = tf.nn.relu(L5)
 
+
         #6th layer 8x8x256
         W6 = tf.Variable(tf.truncated_normal(shape=[3, 3, 256, 128], stddev=5e-2))
         L6 = tf.nn.conv2d(L5, W6, strides=[1, 1, 1, 1], padding='SAME')
@@ -50,8 +53,9 @@ class function:
         L7 = tf.nn.conv2d(L6, W7, strides=[1, 1, 1, 1], padding='SAME')
         L7 = tf.nn.relu(L7)
 
+
         #fully connected 8x8x128
-        fc = tf.reshape(L6, [-1, 8 * 8 * 128])
+        fc = tf.reshape(L7, [-1, 8 * 8 * 128])
         W_fc1 = tf.Variable(tf.truncated_normal(shape=[8 * 8 * 128, 1000], stddev=5e-2))
         b_fc1 = tf.Variable(tf.random_normal([1000]))
         L_fc1 = tf.nn.relu(tf.matmul(fc, W_fc1) + b_fc1)
@@ -64,7 +68,7 @@ class function:
 
         return prediction, logit
 
-    def cnn_classifier_with_skip_connection(x):
+    def cnn_classifier_with_skip_connection(self,x,keep_prop):
         print("SKIP CONNECTION ACTIVATED~~~~~~~")
         # first_layer 32x32x3
         W1 = tf.Variable(tf.truncated_normal(shape=[3, 3, 3, 64], stddev=5e-2))
@@ -79,6 +83,7 @@ class function:
         L2 = tf.nn.conv2d(L1, W2, strides=[1, 1, 1, 1], padding='SAME')
         L2 = tf.nn.relu(L2)
         L2 = tf.nn.max_pool(L2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding="SAME")
+        L2 = tf.nn.dropout(L2,keep_prop)
 
         # third layer 8x8x64
         W3 = tf.Variable(tf.truncated_normal(shape=[3, 3, 64, 128], stddev=5e-2))
@@ -95,7 +100,6 @@ class function:
         L5 = tf.nn.conv2d(L4, W5, strides=[1, 1, 1, 1], padding='SAME')
         L5 = tf.nn.relu(L5+L4)
 
-
         #6th layer 8x8x256
         W6 = tf.Variable(tf.truncated_normal(shape=[3, 3, 256, 128], stddev=5e-2))
         L6 = tf.nn.conv2d(L5, W6, strides=[1, 1, 1, 1], padding='SAME')
@@ -105,15 +109,16 @@ class function:
         L7 = tf.nn.conv2d(L6, W7, strides=[1, 1, 1, 1], padding='SAME')
         L7 = tf.nn.relu(L7+L3)
 
+
         #fully connected 8x8x128
-        fc = tf.reshape(L6, [-1, 8 * 8 * 128])
+        fc = tf.reshape(L7, [-1, 8 * 8 * 128])
         W_fc1 = tf.Variable(tf.truncated_normal(shape=[8 * 8 * 128, 1000], stddev=5e-2))
         b_fc1 = tf.Variable(tf.random_normal([1000]))
         L_fc1 = tf.nn.relu(tf.matmul(fc, W_fc1) + b_fc1)
 
 
-        W_fc2 = tf.Variable(tf.truncated_normal(shape=[1000, 100], stddev=5e-2))
-        b_fc2 = tf.Variable(tf.random_normal([100]))
+        W_fc2 = tf.Variable(tf.truncated_normal(shape=[1000, 10], stddev=5e-2))
+        b_fc2 = tf.Variable(tf.random_normal([10]))
         logit = tf.matmul(L_fc1, W_fc2) + b_fc2
         prediction = tf.nn.softmax(logit)
 
