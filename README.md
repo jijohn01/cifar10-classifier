@@ -4,4 +4,5 @@ Deep Learning(CV) : cifar10 image classification practice
 - numpy (1.17.4)
 - tensorflow ()
 - matplotlib(3.1.2)
-- 
+
+### 
